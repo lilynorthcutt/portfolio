@@ -1,0 +1,34 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Lily Northcutt"
+  navbar:
+    right:
+      - href: index.qmd
+        text: Home
+      - href: about.qmd
+        text: About Me
+      - href: portfolio/index.qmd
+        text: Projects
+      - icon: github
+        href: https://github.com/lilynorthcutt
+        aria-label: github
+      - icon: linkedin
+        href: https://www.linkedin.com/in/lily-northcutt-934a10177/
+        aria-label: linkedin
+      - icon: email
+        href: mailto:northcuttlilya@gmail.com
+        aria-label: email
+
+format:
+  html:
+    theme: 
+      light: cosmo
+      dark: slate
+    css: styles.css
+    toc: true
+
+editor: visual
+

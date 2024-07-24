@@ -1,0 +1,26 @@
+---
+title: "About Me"
+about:
+  id: about-info
+  template: trestles
+  image: image/profile.jpg
+  image-shape: rounded
+  links: 
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/lily-northcutt-934a10177/
+    - icon: github
+      text: github
+      href: https://github.com/lilynorthcutt
+    - icon: envelope
+      text: Email
+      href: mailto:northcuttlilya@gmail.com
+---
+
+Hi, I'm Lily.
+
+I'm a data scientist who loves turning abstract problems into clear, actionable solutions.
+
+I help scientists, researchers, and leaders tackle their toughest challenges by guiding them through the entire data science pipeline—from gathering and cleaning data to applying machine learning, AI, and statistical analysis.
+
+My goal is to empower users to make informed, data-driven decisions and gain deeper insights through compelling visualizations and build interactive tools.

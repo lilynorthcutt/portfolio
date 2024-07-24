@@ -1,0 +1,17 @@
+---
+title: "Projects"
+description: "A collection of data science projects I've worked on"
+listing: 
+  contents: 
+    - "projects/heartdisease.qmd"
+    - "projects/sierraNevadaAge/writeup.qmd"
+    - "projects/reddit-LLM.qmd"
+  sort: "date desc"
+  type: default
+  categories: true
+  sort-ui: false
+  filter-ui: false
+page-layout: full
+title-block-banner: true
+page-navigation: true
+---

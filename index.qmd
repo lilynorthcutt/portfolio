@@ -1,0 +1,23 @@
+---
+image: image/profile.jpg
+about:
+  id: my-info
+  template: jolla
+  image-shape: round
+  links: 
+    - icon: linkedin
+      text: LinkedIn
+      url: https://www.linkedin.com/in/lily-northcutt-934a10177/
+    - icon: github
+      text: github
+      url: https://github.com/lilynorthcutt
+    - icon: envelope
+      text: Email
+      url: mailto:northcuttlilya@gmail.com
+---
+
+Hi, my name is Lily.
+
+I'm a **Data Scientist** who enjoys applying **machine learning** (ML) to challenging problems across various fields, and building **visualization tools** to communicate findings.
+
+Feel free to explore my projects to see my work in action. Thanks for stopping by!
