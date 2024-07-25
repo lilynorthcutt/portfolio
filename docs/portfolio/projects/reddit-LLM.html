@@ -233,7 +233,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="data-cleaning" class="level2">
 <h2 class="anchored" data-anchor-id="data-cleaning">Data Cleaning</h2>
 <p>The first step (at the time) was to use Reddit’s Pushshift API to gather all r/incel historical posts. Using spark, I read in the data with the following code, and began to clean it:</p>
-<div id="9373b1be" class="cell" data-execution_count="1">
+<div id="5dca3d6c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> findspark</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>findspark.init()</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -287,7 +287,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <p>As seen in the pipeline graphic above and code below, I initialized the Document Assembler, Universal Sentence Encode, and Classifier DL for my LLM pipeline.</p>
-<div id="821c864d" class="cell" data-execution_count="2">
+<div id="9077ae3a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SparkNLP Pipeline</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>document <span class="op">=</span> DocumentAssembler()<span class="op">\</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .setInputCol(<span class="st">"title"</span>)<span class="op">\</span></span>
@@ -323,7 +323,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The next step was to split the data into testing and training sets, and train the model. Performing this once using submission titles and again using submission post text I found that the posts model was slightly more accurate. The training data and accuracy, precision, and recall for both models can be seen in the table above.</p>
 <p>While the accuracy is slightly better for the model trained on post text, the number of submissions the model was trained on was significantly lower (10,000 submissions vs.&nbsp;2,000). This is because, after the cleaning process for the post text model, only 2,000 submissions remained. The implication is that this model, while it performs better, is less applicable as it cannot be used on 80% of the submissions. Therefore, going forward, I recommend using the model trained on submission titles.</p>
 <p>Below is the code to train the title model:</p>
-<div id="1ebb4e61" class="cell" data-execution_count="3">
+<div id="a78f0525" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split into test and training set</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>(train_set, test_set)<span class="op">=</span> df_incel.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">100</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -363,7 +363,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="incel-related-offshoots" class="level4">
 <h4 class="anchored" data-anchor-id="incel-related-offshoots">Incel Related Offshoots</h4>
 <p>I looked at three specific subreddits associated with the incel community that were also banned for hatespeech: r/Braincels (banned 2019), r/shortcels (banned 2020), and r/TruFemcels (banned 2020).</p>
-<div id="b82256d9" class="cell" data-execution_count="4">
+<div id="61770072" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in json files for braincels, shortcels, and trufemcels</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>tests <span class="op">=</span> spark.read.json(<span class="st">"tests/*.json"</span>, multiLine<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
