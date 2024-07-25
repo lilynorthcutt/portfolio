@@ -9,11 +9,11 @@ categories: [Python, ML, NLP, LLM]
 
 The internet has become a breeding ground for various ideologies, some of which propagate harmful narratives and hate speech. One such community that has gained notoriety in the past decade is the "incel" (involuntary celibate) movement, known for its misogynistic rhetoric and, in some cases, calls for violence against women. The banning of the r/Incels subreddit in 2017 marked a significant moment in Reddit's content moderation efforts, but it also led to the dispersion of this community across other platforms and other subreddits.
 
-This project aims to leverage the power of Natural Language Processing (NLP) and Machine Learning (ML) techniques to track the evolution of incel-related hate speech and sentiment on Reddit. By focusing on the banned r/Incels subreddit and its subsequent offshoots, we seek to understand how misogynistic language persists and evolves in online spaces, even after community bans.
+This project aims to leverage the power of Natural Language Processing (NLP) and Machine Learning (ML) techniques to track the evolution of incel-related hate speech and sentiment on Reddit. By focusing on the banned r/Incels subreddit and its subsequent offshoots, I seek to understand how misogynistic language persists and evolves in online spaces, even after community bans.
 
 Back in 2021 I conducted some analysis of this data. As you will see below, I leveraged Spark to ingest, and process Reddit posts, taking advantage of the then-free access to Reddit's API. I then trained Large Language Models (LLMs) to classify the r/Incels subreddit posts, and applied this model to offshoots of this community post-ban, yielding interesting results.
 
-With advancements in the NLP field, I wanted to revisit this 2021 project using some sentiment analysis techniques. This analysis can be found in a different notebook here.
+With advancements in the NLP field, I wanted to revisit this 2021 project using some sentiment analysis techniques. I have just started working on this analysis, and you can follow my progress in the notebook [here](https://github.com/lilynorthcutt/redditHateSpeech/blob/main/sentiment_vectorspace.ipynb).
 
 # Using Large Language Models for Incel Subreddit Classification
 
@@ -151,9 +151,9 @@ The top right quadrant shows posts misclassified as r/Incel:
 -   From r/xxfitness: "Zyzz da best sigma male." The model likely flagged the term "sigma male," which is a common term in the incel vocabulary. This is valuable as, depending on frequency and tone of useage (ironic vs. serious) we can detect overlap in communities and/or identify at risk individuals that may benefit from early intervention prevention strategies.
 -   From r/Jokes: "Since he was conceived on it, it's not really a pull out couch." This misclassification suggests the incel subreddit contains significant sexual content and language.
 
-The bottom left quadrant displays a post from the r/Incels subreddit that was not found by the model. It starts off by listing some quotes, "Have a great day," "Cheers," "Please seek help." The post then goes on to say "Obviously there are many more, these are the ones they use to be condescendingly polite, with varying degrees of self awareness about the condescending part." We can infer that the redditor is talking phrases that upset him as he believes they are said with condescending and disingenuous intentions. This is further evident by his clarifications that adding a smiley face to best wishes and (someone he has romantic feelings for) calling him mate makes the remark more painful.
+The bottom left quadrant displays a post from the r/Incels subreddit that was not found by the model. It starts off by listing some quotes: "Have a great day," "Cheers," "Please seek help." The post then goes on to say "Obviously there are many more, these are the ones they use to be condescendingly polite, with varying degrees of self awareness about the condescending part." We can infer that the redditor is talking phrases that upset him as he believes they are said with condescending and disingenuous intentions. This is further evident by his clarifications that adding a smiley face to best wishes and (someone he has romantic feelings for) calling him mate makes the remark more painful.
 
-It is interesting to hypothesis why the model missed this post, it could be that it saw the smiley faces, and all the best wishes and did not understand the context or sentiment the user had towards these phrases. It could also be that this post did not register because it is "more tame" than a majority of other posts which contain hateful and violent messaging. Some examples of post titles were: "reasons why women are the embodiment of evil," and "proof that girls are nothing but trash that use men." This misclassification highlights the prevalence of extreme misogyny in the subreddit and suggests a potential method for early intervention by identifying less radicalized individuals within hate groups.
+It is interesting to hypothesize why the model missed this post, it could be that it saw the smiley faces, and all the best wishes and did not understand the context or sentiment the user had towards these phrases. It could also be that this post did not register because it is "more tame" than a majority of other posts which contain hateful and violent messaging. For reference, here are two title examples: "reasons why women are the embodiment of evil," and "proof that girls are nothing but trash that use men." This misclassification highlights the prevalence of extreme misogyny in the subreddit and suggests a potential method for early intervention by identifying less radicalized individuals within hate groups.
 
 ### Model Application
 
@@ -206,11 +206,11 @@ Using the same code, I analyzed 5,000 random reddit submissions, and found the f
 2.  Most matches came from r/AskReddit, r/Sex, and r/relationship_advice.
 3.  Approximately 20% of r/Sex titles were classified as r/Incel, suggesting highly sexual content in incel titles.
 
-A closer look at the actually titles and their classification could provide usefull insight into the model's classification criteria.
+A closer look at the actually titles and their classification could provide useful insight into the model's classification criteria.
 
 # Conclusion and Future Work
 
-This study leveraged LLMs to analyze and track the evolution of incel-related content on Reddit. My findings reveal the persistence and adaptability of incel rhetoric across different subreddits, even after the banning of the original r/Incels community. The model's ability to identify incel-like content in seemingly unrelated subreddits highlights the pervasive nature of this ideology and the potential for its spread.
+This study leverages LLMs to analyze and track the evolution of incel-related content on Reddit. My findings reveal the persistence and adaptability of incel rhetoric across different subreddits, even after the banning of the original r/Incels community. The model's ability to identify incel-like content in seemingly unrelated subreddits highlights the pervasive nature of this ideology and the potential for its spread.
 
 Key insights include:
 
@@ -231,4 +231,4 @@ Natural Language Processing continues to offer exciting avenues for exploring hu
 -   Cross-platform analysis: Extend the study to other social media platforms to compare and contrast the expression of incel ideology across different online environments.
 -   Intervention strategies: Develop and test AI-assisted intervention methods based on early detection of incel-like content.
 
-By continuing to refine and apply NLP techniques to these complex social issues, we can work towards creating safer and more inclusive online spaces. Thank you for engaging with this analysis of LLMs applied to incel-related content. For a complementary perspective on this data, please refer to our sentiment analysis study, which further explores the emotional landscape of these online communities.
+By continuing to refine and apply NLP techniques to these complex social issues, we can work towards creating safer and more inclusive online spaces. Thank you for engaging with this analysis of LLMs applied to incel-related content. For a complementary perspective on this data, please check back in on my [sentiment analysis study](https://github.com/lilynorthcutt/redditHateSpeech/blob/main/sentiment_vectorspace.ipynb), which I am currently working on to further explore the emotional landscape of these online communities.

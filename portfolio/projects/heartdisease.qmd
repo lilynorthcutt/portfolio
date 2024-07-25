@@ -9,9 +9,11 @@ date: "2024-07-18"
 
 Heart disease is a leading cause of mortality worldwide, yet significant gender disparities exist in its study and treatment. Historically, research has predominantly focused on male patients, resulting in diagnostic and treatment protocols that do not fully address the unique ways in which heart disease manifests in women. This oversight has led to a critical gap in our understanding and care of heart disease in women.
 
-The original data can me found [here](https://archive.ics.uci.edu/dataset/45/heart+disease). I have already saved it as a csv file and will be accessing this file. Mutliple researchers have explored this data and gotten good predictions on the data!
+The original data can be found [here](https://archive.ics.uci.edu/dataset/45/heart+disease). I have already saved it as a csv file and will be accessing this file. Multiple researchers have previously explored this data and gotten good predictions on the data!
 
-**The goal of this project is to explore how sex plays a role in heart disease indicators.** By doing so, we aim to provide medical professionals with deeper insights into the early indicators of heart disease and ensure that sex-specific factors are considered for improved diagnosis and treatment.
+**The goal of this project is to explore how sex plays a role in heart disease indicators.**
+
+By doing so, I aim to provide medical professionals with deeper insights into the early indicators of heart disease and ensure that sex-specific factors are considered for improved diagnosis and treatment.
 
 To get started lets read in the data and take a look at the first 5 rows.
 
@@ -83,7 +85,7 @@ df %>% select(-num) %>% mutate_at(vars(-sex, -heart_disease), normalize)%>%
 
 During the data cleaning process, six data points were removed due to missing information. While imputation methods could be considered to address this issue, for the purpose of this project, I have chosen to omit this step. The primary goal here is to understand the impact of sex on predicting heart disease, rather than achieving the highest possible prediction accuracy.
 
-An initial review of the dataset reveals a significant gender imbalance, with more men represented in the study than women. This is true for both individuals diagnosed with heart disease and those without. The graph of feature means illustrates differences between feature expression for those with and without heart disease. Additionally, certain features, such as `thal`, `oldpeak`, and `exang`, display distinct variations between men and women. This suggests that the same approach to finding heart disease indicators may not be equally effective for both men and women.
+An initial review of the dataset reveals a significant gender imbalance, with more men represented in the study than women. This is true for both individuals diagnosed with heart disease and those without. The graph of feature means illustrates differences between feature expression for those with and without heart disease. Additionally, certain features, such as `trestbps`, `thal`, and `slope`, display distinct variations between men and women. This suggests that the same approach to finding heart disease indicators may not be equally effective for both men and women.
 
 ## Decision Tree Models
 
@@ -91,7 +93,7 @@ Bringing it back to our original goal, to explore how sex plays a role in heart 
 
 ### Why Decision Trees?
 
-Decision trees may not always be the best models that give the highest predictive accuracy, however I think are a great model to use to help us understand our problem at hand.
+Decision trees may not always be the best models that give the highest predictive accuracy, however they are a great model to help us understand our problem at hand.
 
 Decision trees are easy to understand and interpret, making the logic behind the predictions clear. This transparency is particularly valuable in the medical field, where it is crucial to explain why certain features are indicative of heart disease. Unlike more complex models such as neural networks, decision trees do not require dimensionality reduction, and they can directly use the original features of the dataset. This simplicity helps maintain the medical terminology and context, making the results more accessible and actionable for healthcare professionals.
 
@@ -143,7 +145,7 @@ print(paste0( cat(men_percent)[1], cat(women_percent)[1]))
 
 ```
 
-It is worth noting that women without heart disease in this dataset are represented MUCH lower rate than women with it.
+It is very important to note that women without heart disease are represented at a __MUCH__ lower rate than women with it in this dataset.
 
 **This begs the question, are women less likely to have heart disease, are there not enough samples of women, or is it a combination of both?**
 
@@ -169,10 +171,10 @@ rpart.plot(full_tree, main = "Full Decision Tree (includes both sexes)")
 
 According to our tree, the most important feature is `cp` (Chest Pain Type (integers 1 - 4) where categories 1 through 3 present symptoms, while 4 is asymptomatic):
 
--   If the patient does not have chest pain symptoms (`cp == 4`), then we take a look at `ca` (number of major vessels (0-3) colored by flourosopy) and `thal` (3 = normal; 6 = fixed defect; 7 = reversable defect ), and find the patient to be at risk of heart disease if they any number of major vessels colored by flourosopy **or** a non-normal `thal`.
+-   If the patient does not have chest pain symptoms (`cp == 4`), then we take a look at `ca` (number of major vessels (0-3) colored by flourosopy) and `thal` (3 = normal; 6 = fixed defect; 7 = reversable defect ), and find the patient to be at risk of heart disease if they have any number of major vessels colored by flourosopy **or** a non-normal `thal`.
 -   If the patient does have chest pain symptoms (`cp == 1, 2, or 3`), then the patient is at risk of of heart disease if they are over 57, **and** a male with a cholesterol over 246.
 
-This demonstrates the huge benefits of a decision tree, as both patients and medical professionals can clearly see from their own medical data where they lie.
+This alone demonstrates the majoy benefits of a decision tree, as both patients and medical professionals can clearly see from their own medical data where they lie.
 
 Now we will evaluate the accuracy as a whole, and for both sexes.
 
@@ -180,7 +182,7 @@ Now we will evaluate the accuracy as a whole, and for both sexes.
 predictions_full <- predict(full_tree, test, type = "class")
 
 cm <- confusionMatrix(predictions_full, as.factor(test$heart_disease))
-print(paste0("Accuracy: ", cm$overall[1]))
+print(paste0("Overall Accuracy: ", cm$overall[1]))
 cm$table
 
 # Add prediction to our test df
@@ -197,7 +199,7 @@ kable(test %>% filter(heart_disease == 'Present', pred == 'None') %>% group_by(s
 
 We see that the tree is achieving an accuracy of almost 0.8 . Out of the people with heart disease 31 were correctly identified and 13 were very unfortunately not found. Of the 13 people the model missed, 8 were men and 5 were women.
 
-\_The model failed to identify 50% of women with heart disease and 23.5% of men with heart disease\_\_.
+__The model failed to identify 50% of women with heart disease and 23.5% of men with heart disease.__
 
 ### Sex Based Trees
 
@@ -211,7 +213,7 @@ rpart.plot(male_tree, main = "Male Decision Tree")
 rpart.plot(female_tree, main = "Female Decision Tree")
 ```
 
-Immediately the difference becomes evident. We can see that the male decision tree is almost identical to the full decision tree, with the replacement of `thal` with `thalach` (and of course removing the sex factor). But the female decision tree simply looks at one indicator for heart disease. Whether of not a woman has a non-normal `thal` is the sole indicator, which is an incredibly important detail that we cannot immediately gather from the full tree.
+Immediately the difference becomes evident. We can see that the male decision tree is almost identical to the full decision tree, with the replacement of `thal` with `thalach` (and of course removing the sex factor). But the female decision tree simply looks at one indicator for heart disease. Whether or not a woman has a non-normal `thal` is the sole indicator, which is an incredibly important detail that we don't see from the full tree.
 
 ```{r}
 predictions_male <- predict(male_tree, test_m, type = "class")
@@ -234,7 +236,7 @@ test_m$pred <- predictions_male
 
 ```
 
-Interestingly enough, the male tree accuracy is lower than the full tree (two additional individuals are incorrectly undiagnosed), but that the female tree accuracy is higher and does better at predicting heart disease.
+Interestingly enough, the male tree accuracy is lower than the full tree (two additional individuals are incorrectly undiagnosed), but that the female tree accuracy is higher and does better at predicting heart disease for women.
 
 ## Conclusion and Future Work
 

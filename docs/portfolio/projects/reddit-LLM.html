@@ -105,7 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -221,9 +221,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
 <p>The internet has become a breeding ground for various ideologies, some of which propagate harmful narratives and hate speech. One such community that has gained notoriety in the past decade is the “incel” (involuntary celibate) movement, known for its misogynistic rhetoric and, in some cases, calls for violence against women. The banning of the r/Incels subreddit in 2017 marked a significant moment in Reddit’s content moderation efforts, but it also led to the dispersion of this community across other platforms and other subreddits.</p>
-<p>This project aims to leverage the power of Natural Language Processing (NLP) and Machine Learning (ML) techniques to track the evolution of incel-related hate speech and sentiment on Reddit. By focusing on the banned r/Incels subreddit and its subsequent offshoots, we seek to understand how misogynistic language persists and evolves in online spaces, even after community bans.</p>
+<p>This project aims to leverage the power of Natural Language Processing (NLP) and Machine Learning (ML) techniques to track the evolution of incel-related hate speech and sentiment on Reddit. By focusing on the banned r/Incels subreddit and its subsequent offshoots, I seek to understand how misogynistic language persists and evolves in online spaces, even after community bans.</p>
 <p>Back in 2021 I conducted some analysis of this data. As you will see below, I leveraged Spark to ingest, and process Reddit posts, taking advantage of the then-free access to Reddit’s API. I then trained Large Language Models (LLMs) to classify the r/Incels subreddit posts, and applied this model to offshoots of this community post-ban, yielding interesting results.</p>
-<p>With advancements in the NLP field, I wanted to revisit this 2021 project using some sentiment analysis techniques. This analysis can be found in a different notebook here.</p>
+<p>With advancements in the NLP field, I wanted to revisit this 2021 project using some sentiment analysis techniques. I have just started working on this analysis, and you can follow my progress in the notebook <a href="https://github.com/lilynorthcutt/redditHateSpeech/blob/main/sentiment_vectorspace.ipynb">here</a>.</p>
 </section>
 <section id="using-large-language-models-for-incel-subreddit-classification" class="level1">
 <h1>Using Large Language Models for Incel Subreddit Classification</h1>
@@ -233,7 +233,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="data-cleaning" class="level2">
 <h2 class="anchored" data-anchor-id="data-cleaning">Data Cleaning</h2>
 <p>The first step (at the time) was to use Reddit’s Pushshift API to gather all r/incel historical posts. Using spark, I read in the data with the following code, and began to clean it:</p>
-<div id="5dca3d6c" class="cell" data-execution_count="1">
+<div id="aefffeb4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> findspark</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>findspark.init()</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -287,7 +287,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <p>As seen in the pipeline graphic above and code below, I initialized the Document Assembler, Universal Sentence Encode, and Classifier DL for my LLM pipeline.</p>
-<div id="9077ae3a" class="cell" data-execution_count="2">
+<div id="c953f104" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SparkNLP Pipeline</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>document <span class="op">=</span> DocumentAssembler()<span class="op">\</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .setInputCol(<span class="st">"title"</span>)<span class="op">\</span></span>
@@ -323,7 +323,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The next step was to split the data into testing and training sets, and train the model. Performing this once using submission titles and again using submission post text I found that the posts model was slightly more accurate. The training data and accuracy, precision, and recall for both models can be seen in the table above.</p>
 <p>While the accuracy is slightly better for the model trained on post text, the number of submissions the model was trained on was significantly lower (10,000 submissions vs.&nbsp;2,000). This is because, after the cleaning process for the post text model, only 2,000 submissions remained. The implication is that this model, while it performs better, is less applicable as it cannot be used on 80% of the submissions. Therefore, going forward, I recommend using the model trained on submission titles.</p>
 <p>Below is the code to train the title model:</p>
-<div id="a78f0525" class="cell" data-execution_count="3">
+<div id="54bf4abf" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split into test and training set</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>(train_set, test_set)<span class="op">=</span> df_incel.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">100</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -354,8 +354,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>From r/xxfitness: “Zyzz da best sigma male.” The model likely flagged the term “sigma male,” which is a common term in the incel vocabulary. This is valuable as, depending on frequency and tone of useage (ironic vs.&nbsp;serious) we can detect overlap in communities and/or identify at risk individuals that may benefit from early intervention prevention strategies.</li>
 <li>From r/Jokes: “Since he was conceived on it, it’s not really a pull out couch.” This misclassification suggests the incel subreddit contains significant sexual content and language.</li>
 </ul>
-<p>The bottom left quadrant displays a post from the r/Incels subreddit that was not found by the model. It starts off by listing some quotes, “Have a great day,” “Cheers,” “Please seek help.” The post then goes on to say “Obviously there are many more, these are the ones they use to be condescendingly polite, with varying degrees of self awareness about the condescending part.” We can infer that the redditor is talking phrases that upset him as he believes they are said with condescending and disingenuous intentions. This is further evident by his clarifications that adding a smiley face to best wishes and (someone he has romantic feelings for) calling him mate makes the remark more painful.</p>
-<p>It is interesting to hypothesis why the model missed this post, it could be that it saw the smiley faces, and all the best wishes and did not understand the context or sentiment the user had towards these phrases. It could also be that this post did not register because it is “more tame” than a majority of other posts which contain hateful and violent messaging. Some examples of post titles were: “reasons why women are the embodiment of evil,” and “proof that girls are nothing but trash that use men.” This misclassification highlights the prevalence of extreme misogyny in the subreddit and suggests a potential method for early intervention by identifying less radicalized individuals within hate groups.</p>
+<p>The bottom left quadrant displays a post from the r/Incels subreddit that was not found by the model. It starts off by listing some quotes: “Have a great day,” “Cheers,” “Please seek help.” The post then goes on to say “Obviously there are many more, these are the ones they use to be condescendingly polite, with varying degrees of self awareness about the condescending part.” We can infer that the redditor is talking phrases that upset him as he believes they are said with condescending and disingenuous intentions. This is further evident by his clarifications that adding a smiley face to best wishes and (someone he has romantic feelings for) calling him mate makes the remark more painful.</p>
+<p>It is interesting to hypothesize why the model missed this post, it could be that it saw the smiley faces, and all the best wishes and did not understand the context or sentiment the user had towards these phrases. It could also be that this post did not register because it is “more tame” than a majority of other posts which contain hateful and violent messaging. For reference, here are two title examples: “reasons why women are the embodiment of evil,” and “proof that girls are nothing but trash that use men.” This misclassification highlights the prevalence of extreme misogyny in the subreddit and suggests a potential method for early intervention by identifying less radicalized individuals within hate groups.</p>
 </section>
 <section id="model-application" class="level3">
 <h3 class="anchored" data-anchor-id="model-application">Model Application</h3>
@@ -363,7 +363,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="incel-related-offshoots" class="level4">
 <h4 class="anchored" data-anchor-id="incel-related-offshoots">Incel Related Offshoots</h4>
 <p>I looked at three specific subreddits associated with the incel community that were also banned for hatespeech: r/Braincels (banned 2019), r/shortcels (banned 2020), and r/TruFemcels (banned 2020).</p>
-<div id="61770072" class="cell" data-execution_count="4">
+<div id="0906e705" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in json files for braincels, shortcels, and trufemcels</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>tests <span class="op">=</span> spark.read.json(<span class="st">"tests/*.json"</span>, multiLine<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -423,13 +423,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Most matches came from r/AskReddit, r/Sex, and r/relationship_advice.</li>
 <li>Approximately 20% of r/Sex titles were classified as r/Incel, suggesting highly sexual content in incel titles.</li>
 </ol>
-<p>A closer look at the actually titles and their classification could provide usefull insight into the model’s classification criteria.</p>
+<p>A closer look at the actually titles and their classification could provide useful insight into the model’s classification criteria.</p>
 </section>
 </section>
 </section>
 <section id="conclusion-and-future-work" class="level1">
 <h1>Conclusion and Future Work</h1>
-<p>This study leveraged LLMs to analyze and track the evolution of incel-related content on Reddit. My findings reveal the persistence and adaptability of incel rhetoric across different subreddits, even after the banning of the original r/Incels community. The model’s ability to identify incel-like content in seemingly unrelated subreddits highlights the pervasive nature of this ideology and the potential for its spread.</p>
+<p>This study leverages LLMs to analyze and track the evolution of incel-related content on Reddit. My findings reveal the persistence and adaptability of incel rhetoric across different subreddits, even after the banning of the original r/Incels community. The model’s ability to identify incel-like content in seemingly unrelated subreddits highlights the pervasive nature of this ideology and the potential for its spread.</p>
 <p>Key insights include:</p>
 <ol type="1">
 <li>The effectiveness of LLMs in detecting incel-related content, with high accuracy rates on both submission titles and post text.</li>
@@ -447,7 +447,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Cross-platform analysis: Extend the study to other social media platforms to compare and contrast the expression of incel ideology across different online environments.</li>
 <li>Intervention strategies: Develop and test AI-assisted intervention methods based on early detection of incel-like content.</li>
 </ul>
-<p>By continuing to refine and apply NLP techniques to these complex social issues, we can work towards creating safer and more inclusive online spaces. Thank you for engaging with this analysis of LLMs applied to incel-related content. For a complementary perspective on this data, please refer to our sentiment analysis study, which further explores the emotional landscape of these online communities.</p>
+<p>By continuing to refine and apply NLP techniques to these complex social issues, we can work towards creating safer and more inclusive online spaces. Thank you for engaging with this analysis of LLMs applied to incel-related content. For a complementary perspective on this data, please check back in on my <a href="https://github.com/lilynorthcutt/redditHateSpeech/blob/main/sentiment_vectorspace.ipynb">sentiment analysis study</a>, which I am currently working on to further explore the emotional landscape of these online communities.</p>
 
 
 </section>

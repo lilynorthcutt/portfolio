@@ -6,13 +6,13 @@ date: "2024-07-22"
 description: "Developping novel ML methods for magamtic migration predictions"
 ---
 
-**Access the interactive dashboard of the data and predictions [here](https://iawc6a-lily-northcutt.shinyapps.io/geoAges/) !**
+**Access the interactive dashboard of the data and predictions [here](https://iawc6a-lily-northcutt.shinyapps.io/geoAges/)!** (addition of predictions coming soon)
 
-**Access the notebook for the full code and predictions at the [github repository](https://github.com/lilynorthcutt/sierraNevadaAge) !**
+**Access the notebook for the full code and predictions on [github](https://github.com/lilynorthcutt/sierraNevadaAge/blob/main/main_experiment.ipynb) !**
 
 ### Summary
 
-This project aims to deepen our understanding of magmatic migration within the Sierra Nevadas. The current samples of geologic ages do not provide uniform coverage of the area. This project aims to offer a solution to this problem by exploring the success of various machine learning (ML) algorithms to predict geologic ages within the region.
+This project aims to deepen our understanding of magmatic migration within the Sierra Nevadas. The current samples of geologic ages do not provide uniform coverage of the area. We explore various machine learning (ML) algorithms abilities to predict geologic ages within the region to offer a solution.
 
 In this write-up, I will go through my process for:
 
@@ -30,17 +30,16 @@ In this write-up, I will go through my process for:
 
 Magmatism plays a key role in mountain formation, as ascending magmas add mass and volume to the Earth's surface and subsurface. However, the causes and rates of magma movement remain largely unknown, necessitating a deeper understanding of these processes. The mountains and canyons in the Sierra Nevadas are formed from granitic rocks, which originated from molten rock that cooled far beneath the Earth's surface. By examining the geologic ages within this area, we can gain insights into the age of the rocks at various locations and understand the magmatic migration and processes that created them.
 
-The current data in the Sierra Nevadas does not uniformly cover the area, making it unrepresentative of the entire region. This is a common problem in geology, as uniformly collecting samples across a region is often impractical due to constraints such as time, resources, coverage area, or sample accessibility. Therefore, there is a need for novel methods to mitigate sampling bias and use geologic age samples to predict uniform coverage of the area.
+The current data in the Sierra Nevadas does not uniformly cover the area, making it unrepresentative of the entire region. This is a common problem in geology, as uniformly collecting samples across a region is often impractical due to constraints such as time, resources, coverage area, or sample accessibility. Therefore, there is a need for novel methods to mitigate sampling bias and use geologic age samples to predict uniform coverage of an area.
 
-**Key Project Goals:**
-
+**Key Project Goals**
 The key goals this project aims to address are the following:
 
 -   **Develop novel machine learning (ML)** methods to fill gaps in geologic maps by predicting undated rock ages.
 -   **Apply the results from the model to predict** undated rock ages, providing a less biased view of magmatic migration.
 -   **Build Interactive Visualizations** for researchers and curious minds to view and explore the data and predictions.
 
-This project was done with `python` for all data cleaning, model training/evaluation, and predictions, and `R` for interactive visualizations in Shiny. he full code is extensive, so some parts are omitted here for brevity. Please refer to the link at the top to view the notebook with the entire code.
+This project was done with `python` for all data cleaning, model training/evaluation, and predictions, and `R` for interactive visualizations in Shiny. The full code is extensive, so some parts are omitted here for brevity. Please refer to the link at the top to view the notebook with the entire code.
 
 Let's begin!
 
@@ -104,7 +103,6 @@ df_ages_raw.head(5)
 
 ```{python}
 # Read in Shapefiles
-# Read in shapefiles
 
 def read_shapefiles_in_folder(folder_path):
     'FUNCTION TO READ IN ALL SHAPEFILES FROM A FOLDERPATH'
@@ -148,12 +146,14 @@ except Exception as e:
 
 We are interested in 2 of the shapefiles:
 
--   DetailedMapDataAreaBoundaryLine: Provides boundary linestring of the area of interest
--   CretaceousIntrusionsIndividualPolygons: Provides polygon geometry with associated geologic time period of the are
+-   DetailedMapDataAreaBoundaryLine: Provides boundary linestring of the area of interest.
+-   CretaceousIntrusionsIndividualPolygons: Provides polygon geometry with associated geologic time period in the area of interest.
 
 ### Data Cleaning and Wrangling
 
-To ensure the data is ready for analysis, we will **handle missing values**, and add geospatial characteristics (POINT() shape). Additionally, lets add some approximate ages to the periods in the shapefiles (late Cretaceous, early Cretaceous, and Jurassic Cretaceous), and then combine the shapefiles with like periods.
+To ensure the data is ready for analysis, we will **handle missing values** and add geospatial characteristics (POINT() shapes). 
+
+Additionally, we'll also add some approximate ages to the periods in the shapefiles (late Cretaceous, early Cretaceous, and Jurassic Cretaceous), and then combine the shapefiles with like periods.
 
 ```{python}
 # Clean csv
@@ -174,6 +174,7 @@ print("Size of cleaned csv data:", len(df_ages))
 df_point = gpd.GeoDataFrame(df_ages, geometry=gpd.points_from_xy(df_ages.Easting, df_ages.Northing),  crs='epsg:26711')
 
 #### Get age statistics
+print("\nAge Statistics: ")
 print(df_ages['Age'].describe())
 
 ##### View distrubtion of ages
@@ -235,15 +236,17 @@ plt.show()
 
 ```
 
-***Note 1:*** The union creates 6 shapefiles because some of the periods are more uncertain and have a `?`. For now, we are handling all periods as if they are all accurate.
+***Note 1:*** The union creates 6 shapefiles because some of the periods are more uncertain and have a `?`. For now, we are handling all periods as if they are all accurate, i.e. `eK` and `eK?` would not be combined, but would be labeled with the same approximate age.
 
-***Note 2:*** There are only polynomials within our boundary.
+***Note 2:*** The polynomials are only within the boundary of interest.
 
 ***Note 3:*** The union creates a shape called a "MULTIPOLINOMIAL" which we can ultimately handle the same as a normal POLYNOMIAL() geometry.
 
 ### Exploratory Data Analysis
 
-Now that we have the data, and it is cleaned up, we can start visualizing our data and exploring it. We already see that our individual ages are mostly between 90-98 Million year ago (Ma), with average age of 99 Ma. Additionally, our polygons reference 3 periods. Note that while the above graph counts the number of polygons it doesn't take into account the total area of the polygons. As we will see below the oldest polygons take up a very small amount of the area.
+Now that we have the cleaned data, we can start visualizing and exploring it. We already see that individual ages are mostly between 90-98 Million year ago (Ma), with average age of 99 Ma. Additionally, the polygons reference 3 periods. 
+
+_Note that while the above graph counts the number of polygons it doesn't take into account the total area of the polygons. As we will see below the oldest polygons take up a very small amount of the area._
 
 Let's first take a look at our map:
 
@@ -262,7 +265,6 @@ colormap = linear.YlOrRd_09.scale(min_age, max_age)
 
 ```
 
-**Interact with me!**
 
 ```{python }
 # | include: false
@@ -380,9 +382,11 @@ Let's add some additional features and see what else we can see.
 
 ### Feature Engineering (Part 1)
 
-We will now perform the first set of **feature engineering** on our data. This involves converting Easting and Northing coordinates to longitude and latitude for ease of interpretation, and creating quartiles for these coordinates. Additionally, we will incorporate important spatial features such as elevation and the geological period of the polygon each point falls into, with the periods one-hot encoded for scaling prior to model training.
+We will now perform the first set of **feature engineering** on our data. This involves converting Easting and Northing coordinates to longitude and latitude for ease of interpretation, and creating quartiles for these coordinates. Additionally, we will incorporate important spatial features such as elevation and the geological period belonging to polygon that each point falls into, with the periods one-hot encoded for scaling prior to model training.
 
-> **IMPORTANT !!!** The function `get_elevation_batch()` being used to get the elevation needs to be modified to run. Please go to the Running the Code section of the [README](https://github.com/lilynorthcutt/sierraNevadaAge?tab=readme-ov-file#running-the-code) for more information.
+If a point does not fall within a polygon, then its period will be `None`. 
+
+> **IMPORTANT !!!** The function `get_elevation_batch()` being used to get the elevation needs to be modified in order to run. Please go to the Running the Code section of the [README](https://github.com/lilynorthcutt/sierraNevadaAge?tab=readme-ov-file#running-the-code) for more information.
 
 ```{python}
 # Feature Engineering - CSV File
@@ -423,7 +427,7 @@ df_ages = pd.get_dummies(df_ages, columns=['period_onehot'])
 
 ```
 
-We can look the number of points that fall into each period below (note that one point does into the KJ period, its just hard to see).
+We can look the number of points that fall into each period below (note that one point does into the KJ period, it's just hard to see).
 
 ```{python}
 # Look at the amount of points at each age in each period
@@ -444,7 +448,7 @@ for i, ax in enumerate(ax.flat):
 
 As we saw in the folium map, a lot of points are outside of the boundary region and do not fall into a polygon (i.e. `period == "None"`). But there are a decent amount of points in the eK and lK periods (only 1 in KJ).
 
-Next we can look at how the location features (Easting, Northing, and Elevation) relate to age.
+Next we can look at how the location specific features (Easting, Northing, and Elevation) relate to age.
 
 ```{python}
 # Plot all features with age individually
@@ -464,11 +468,11 @@ fig = px.scatter_3d(df_ages, x='Easting', y='Northing', z='elevation', color='Ag
 fig.update_layout(scene_zaxis_type="log")
 ```
 
-From the graphs of relating easting, northing, and elevation to age we see that easting and elevation are showing a stronger trend with age than northing.
+From these graphs, we note that easting and elevation are showing a stronger trend in relation to age than northing.
 
 ### Test/Train Split
 
-Before training ML models, the data must be split into test and training sets. This is my first time working with GIS data and I was excited to learn about various test/train split methods when handling this sort of data. In addition to the traditional split, I tried out a Spatial KFold CV method, and a Cluster-Based Split method.
+Before training ML models, the data must be split into test and training sets. This is my first time working with GIS data and I was excited to learn about various test/train splitting methods when handling this sort of data. In addition to a traditional split, I tried out a Spatial KFold Splitting method, and a Cluster-Based Splitting method.
 
 ```{python}
 # Split data into test and train 
@@ -502,17 +506,17 @@ df_dict = {
 
 ```
 
-The difference in how the test train splitting methods split the data with respect to location:
+The difference in how the methods split the data with respect to location:
 
 ```{python}
-# | include: false
+# | echo: false
 splits = [
     {'name': 'Traditional','train': train_trad, 'test': test_trad},
     {"name": "Spatial K-Fold",'train': train_kf, 'test': test_kf},
     {"name":"Cluster-Based", 'train': train_clust, 'test': test_clust}
 ]
 
-# View difference in test/train split for each method
+    # View difference in test/train split for each method
 fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15,5))
 for i, ax in enumerate(ax.flat):
     name = splits[i]['name']
@@ -526,10 +530,9 @@ for i, ax in enumerate(ax.flat):
     ax.set_title(f' {name} Splits')
     ax.grid(True)
     ax.legend()
-    
 ```
 
-The difference in how the test train splitting methods split the data with respect to capturing age:
+The difference in how the methods split the data with respect to capturing age:
 
 ```{python}
 # | echo: false
@@ -567,7 +570,7 @@ As I learn more about ML with GIS data, I may revisit this. Please reach out if 
 
 ### Cross Validation
 
-To ensure robust model evaluation for hyper-parameter tuning, I perform 5-fold cross-validation on my training set and store the results in a dictionary. I prefer using a dictionary for this purpose as it keeps everything organized and easily accessible!
+To ensure robust model evaluation for hyper-parameter tuning, we perform 5-fold cross-validation on my training set and store the results in a dictionary. I prefer using a dictionary for this purpose as it keeps everything organized and easily accessible!
 
 ```{python}
 # Setting up k-fold cross-validation, and storing split in dictionary for easy access
@@ -597,7 +600,7 @@ Within the cross-validation sets, I perform a second round of feature engineerin
 
 **Why not let `GridSearchCV()` split the data into k-folds?**
 
-While it might seem convenient to let `GridSearchCV` handle data splitting later on, there's an important reason for my approach. We already have some good features, but it's vital to provide the data with additional context about its surroundings. Specifically, for a given point `o_0`, I calculate the age, distance, and angle of the next closest points: `o_1`, `o_2`, and `o_3.` This is done in two dimensions (combining Easting and Northing) and individually for Easting, Northing, and Elevation in one dimension.
+While it might seem convenient to let `GridSearchCV` handle cross-validation, there's an important reason for this approach. We already have some good features, but it's vital to provide the data with additional context about its surroundings. Specifically, for a given point `o_0`, I calculate the age, distance, and angle of the next closest points: `o_1`, `o_2`, and `o_3.` This is done in two dimensions (combining Easting and Northing) and individually for Easting, Northing, and Elevation in one dimension.
 
 **Preventing Leakage and Overfitting**
 
@@ -606,9 +609,10 @@ A major concern in this process is data leakage, which occurs when the training 
 -   Training Data: The training data will have age/distance/bearing labels based on the training data itself.
 -   Test Data: Both the hold-out and cross-validation test sets will have age/distance/bearing labels based on the training data only.
 
-**Using `GridSearchCV()` for Hyper-Parameter Tuning** For hyper-parameter tuning of most models, I use `GridSearchCV()`. To integrate the custom feature engineering steps, I define a custom cross-validation (CV) class that uses the predefined CV indices along with the training set. This class adds the new features to the training and testing folds separately before training the models.
+**Using `GridSearchCV()` for Hyper-Parameter Tuning** 
 
-**Note 2:** For the functions used in feature engineering, please refer to the full code provided at the link above.
+For hyper-parameter tuning of most models, I use `GridSearchCV()`. To integrate the second round of feature engineering, I define a custom cross-validation (CV) class that uses the predefined CV indices along with the training set. This class adds the new features to the training and testing folds separately before training the models.
+
 
 ```{python}
 # | include: false
@@ -689,6 +693,8 @@ def get_closest_points_metrics(selected_point, reference_df, num_closest=3, trai
 # <--------- Closest n Ages + Direction + Bearing ------------->
 # We will calculate age of the closest 3 points in for each direction individually (northing/easting/elevation),
 # and top-down in 2 dimensions (easting+northing): Adding age, direction and bearing for each
+
+# FUNCTIONS CALCULATING METRICS ARE OMITTED HERE #
 
 start = time.time()
 
@@ -778,14 +784,16 @@ The full list of models trained in this project includes:
 -   Random Forest
 -   Gradient Boosting Machine (GBM)
 -   K-Nearest Neighbor (KNN)
--   Gaussian Process Regressor The full code, including training for all models, is available at the link provided at the top.
+-   Gaussian Process Regressor 
+
+The full code, including training for all models, is available at the link provided at the top.
 
 Let's get started!
 
 Before diving into the specific models, let's define and initialize a few key components to ensure the training process runs smoothly.
 
 ```{python}
-# For now I'm just training on the traditionally split test/train data - and will repeat on the other splits at a later time
+# Select the traditionally split data
 df_test_train = df_dict['trad']
 
 # Set list of features and target
@@ -826,7 +834,7 @@ df_test_train['model_metrics'] = {}
 
 ### K-Nearest Neighbors
 
-The k-nearest neighbors (KNN) algorithm is a versatile non-parametric supervised learning method that makes predictions based on the k nearest points to a given data point. The challenge lies in determining the optimal number of nearest points (`k`) to use. To start, we will try `k` values ranging from 1 to 20 and evaluate the average RMSE (Root Mean Squared Error) across the cross-validation folds for each `k.`
+The K-Nearest Neighbors (KNN) algorithm is a versatile, non-parametric supervised learning method that makes predictions based on the k nearest points to a given data point. The challenge lies in determining the optimal number of nearest points (`k`) to use. To start, we will try `k` values ranging from 1 to 20 and evaluate the average RMSE (Root Mean Squared Error) across the cross-validation folds for each `k`.
 
 ```{python}
 # ----------- Hyper-Parameter Tuning -------------
@@ -942,7 +950,7 @@ plt.show()
 
 ### Gradient Boosting Machine
 
-For the GBM model, we will use `GridSearchCV` combination with the custom cross-validation class defined earlier and pipeline defined below In our parameter grid, each parameter name must be prefixed with `model__` to ensure that `GridSearchCV` correctly applies the parameters to the appropriate part of the pipeline. This setup allows us to systematically search for the best parameters while leveraging the benefits of cross-validation.
+For the GBM model, we will use `GridSearchCV` in combination with the custom cross-validation class defined earlier and the pipeline defined below. In our parameter grid, each parameter name must be prefixed with `model__` to ensure that `GridSearchCV` correctly applies the parameters to the appropriate part of the pipeline. This setup allows us to systematically search for the best parameters while leveraging the benefits of cross-validation.
 
 ```{python}
 # Train model on all folds (indices for our cv already specified in grid_search)
@@ -1026,7 +1034,7 @@ plt.show()
 
 ## Evaluate
 
-After training all our models, we can assess their performance using metrics such as RMSE (Root Mean Squared Error) and R\^2. The following table summarizes these metrics for each model:
+After training all our models, we can assess their performance using metrics such as the RMSE (Root Mean Squared Error) and the R2 score. The following table summarizes these metrics for each model:
 
 ```{python}
 # | echo: false
@@ -1045,11 +1053,11 @@ From the table, we can see that the Gaussian Process Regressor is the best-perfo
 
 To gain further insights into the models, we can explore feature importance. For models like Decision Trees, Random Forests, and Gradient Boosting Machines (GBM), we can use built-in methods to obtain feature importance scores. Otherwise, we use permutation importance to assess the impact of each feature on model performance. I won't be addressing this here as I only trained two of the models in this writeup.
 
-For practical applications, including integration into the Shiny app, we will retrain the selected model (Gaussian Process Regressor with the best parameters) using all available data. This final model will be used for predicting and forecasting unknown data points.
+For practical applications, including integration into the Shiny app, we will __retrain the selected model (Gaussian Process Regressor with the best parameters) using all available data__. This final model will be used for predicting and forecasting unknown data points.
 
 ## Conclusion
 
-This project successfully developed and applied new machine learning (ML) methods to address critical gaps in geologic maps by predicting undated rock ages within the Sierra Nevadas. By leveraging advanced algorithms, including Decision Trees, Random Forests, Gradient Boosting Machines, K-Nearest Neighbors, and Gaussian Process Regressors, we have provided valuable insights into magmatic migration and rock formation processes. The Gaussian Process Regressor emerged as the top performer, offering a robust model with an R2 score of 0.81.
+This project successfully developed and applied new (ML) methods to address critical gaps in geologic maps by predicting undated rock ages within the Sierra Nevadas. By leveraging advanced algorithms, including Decision Trees, Random Forests, Gradient Boosting Machines, K-Nearest Neighbors, and Gaussian Process Regressors, we have provided valuable insights into magmatic migration and rock formation processes. The Gaussian Process Regressor emerged as the top performer, offering a robust model with an R2 score of 0.81.
 
 This approach allows us to present a less biased view of magmatic migration, enhancing our understanding of the geological history in the Sierra Nevadas.
 
@@ -1057,22 +1065,22 @@ Additionally, the interactive visualizations in Shiny enable researchers and int
 
 ## Future Work
 
-This was my first project working with GIS data, and I have lots of ideas for additionally avenues I would like to explore. Here are a few ideas:
+This was my first project working with GIS data, and I have lots of ideas I would like to explore. Here are a few ideas:
 
 **Enhanced ML Methods:**
 
--   Investigate more sophisticated ML models, including deep learning techniques and geo neural networks to improve accuracy and robustness
+-   Investigate more sophisticated ML models, including deep learning techniques and geospatial neural networks to improve accuracy and robustness
 -   Further optimization of model parameters through methods such as Bayesian optimization
 
 **Broadening Application Results:**
 
--   Finding other use case areas to apply the methodology explored here, and compare results to see if the modeling can be applied universally or only at this location
+-   Finding other use case areas to apply the methodology explored here, and compare results to see if this methodology can be applied universally or only at this location
 
 **Improving Shiny Visualizations:**
 
--   Add Models:Add grid of boundary area predicted by models to show ages predicted uniformly over the area
--   Age Histogram: Add histogram of ages corresponding to the ages in the map (i.e. lines up with the Age sliderbar)
--   Custom Line Predictions: Add functionality for users to select a model, and select a line on the map. The app will then generate predictions of ages along the line and output a 2D graph of *line* vs. age.
+-   Add Models: Add grid of boundary area predicted by models to show ages predicted uniformly over the area
+-   Age Histogram: Add histogram of ages corresponding to the ages in the map (lines up with the Age sliderbar)
+-   Custom Line Predictions: Add functionality for users to select a model, and specify a line within the boundary. The app will then generate predictions of ages along the line and output a 2D graph of *line* vs. age.
 
 Thank you for stopping by and reading through my work!
 
