@@ -24,3 +24,4 @@ I'm a data scientist who loves turning abstract problems into clear, actionable 
 I help scientists, researchers, and leaders tackle their toughest challenges by guiding them through the entire data science process — from gathering and cleaning data to applying machine learning, artificial intelligence, and statistical analysis.
 
 My goal is to empower users to make informed, data-driven decisions and gain deeper insights through compelling visualizations and build interactive tools.
+

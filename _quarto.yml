@@ -12,6 +12,8 @@ website:
         text: About Me
       - href: portfolio/index.qmd
         text: Projects
+      - href: resume/index.qmd
+        text: Resume
       - icon: github
         href: https://github.com/lilynorthcutt
         aria-label: github
